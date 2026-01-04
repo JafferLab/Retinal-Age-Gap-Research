@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+python-multipart
+jinja2
+torch
+torchvision
+timm==0.5.4
+pillow
+numpy
+tqdm

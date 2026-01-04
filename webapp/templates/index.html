@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retinal Age Gap - Research Use Only</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="banner">
+        ⚠️ Research / Investigational Use Only | Model trained on healthy eyes | Not validated for external data | Not a diagnostic device
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>Retinal Age Gap</h1>
+            <p class="subtitle">WCM Oph Research</p>
+        </header>
+
+        <!-- Step 1: Prediction -->
+        <section id="prediction-section" class="card">
+            <h2>Step 1: Predict Retinal Age</h2>
+            <form id="predict-form">
+                <div class="form-group">
+                    <label for="fundus-image">Fundus Image (PNG/JPG)</label>
+                    <div class="file-upload-wrapper">
+                        <input type="file" id="fundus-image" name="file" accept="image/png, image/jpeg" required>
+                        <div class="file-upload-placeholder">Click to upload or drag and drop</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Laterality</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="laterality" value="OD" required>
+                            OD (Right)
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="laterality" value="OS" required>
+                            OS (Left)
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary" id="predict-btn">Predict Retinal Age</button>
+            </form>
+            
+            <div id="loading-spinner" class="hidden">
+                <div class="spinner"></div>
+                <p>Processing image...</p>
+            </div>
+        </section>
+
+        <!-- Results Panel -->
+        <section id="results-section" class="card hidden">
+            <h2>Prediction Results</h2>
+            
+            <div class="result-row">
+                <div class="result-item">
+                    <span class="label">Predicted Retinal Age</span>
+                    <span class="value" id="predicted-age">--</span>
+                    <span class="unit">years</span>
+                </div>
+                <div class="result-item">
+                    <span class="label">QC Status</span>
+                    <span class="value" id="qc-status">--</span>
+                </div>
+            </div>
+
+            <div id="qc-details" class="qc-details hidden">
+                <p><strong>QC Issues:</strong> <span id="qc-reasons"></span></p>
+            </div>
+
+            <div class="meta-info">
+                <small>Model: <span id="model-version"></span> | App: <span id="app-version"></span></small>
+            </div>
+        </section>
+
+        <!-- Step 2: Age Gap -->
+        <section id="gap-section" class="card hidden">
+            <h2>Step 2: Compute Retinal Age Gap</h2>
+            <form id="gap-form">
+                <div class="form-group">
+                    <label for="dob">Date of Birth</label>
+                    <input type="date" id="dob" name="dob" required>
+                </div>
+                <button type="submit" class="btn-secondary">Compute Retinal Age Gap</button>
+            </form>
+
+            <div id="gap-results" class="gap-results hidden">
+                <div class="result-row">
+                    <div class="result-item">
+                        <span class="label">Chronological Age</span>
+                        <span class="value" id="chrono-age">--</span>
+                        <span class="unit">years</span>
+                    </div>
+                    <div class="result-item highlight">
+                        <span class="label">Retinal Age Gap</span>
+                        <span class="value" id="age-gap">--</span>
+                        <span class="unit">years</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>

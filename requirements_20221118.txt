@@ -1,0 +1,11 @@
+torch==1.9.0+cu111
+#torchがインストールできない場合は以下をお試しください
+#torch==1.9.0+cu111 -f https://download.pytorch.org/whl/torch_stable.html
+torchvision==0.10.0+cu111
+#torchvisionがインストールできない場合は以下をお試しください
+#torchvision==0.10.0+cu111 -f https://download.pytorch.org/whl/torch_stable.html
+timm==0.5.4
+numpy==1.22.1
+Pillow==9.0.0
+tqdm==4.62.3
+ipywidgets==8.0.2
