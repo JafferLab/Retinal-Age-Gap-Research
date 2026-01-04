@@ -2,9 +2,6 @@ fastapi
 uvicorn
 python-multipart
 jinja2
-torch
-torchvision
-timm==0.5.4
+onnxruntime
 pillow
 numpy
-tqdm

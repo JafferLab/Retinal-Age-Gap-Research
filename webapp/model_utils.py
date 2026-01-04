@@ -1,35 +1,26 @@
-import torch
-import timm
+import onnxruntime
 import numpy as np
 from PIL import Image
-import torchvision.transforms as transforms
 import os
 
 # Define constants
-MODEL_PATH = os.path.join(os.path.dirname(__file__), '..', 'model_20220903.pth')
-MEAN = (0.485, 0.456, 0.406)
-STD = (0.229, 0.224, 0.225)
+MODEL_PATH = os.path.join(os.path.dirname(__file__), '..', 'model.onnx')
+MEAN = np.array([0.485, 0.456, 0.406], dtype=np.float32).reshape(3, 1, 1)
+STD = np.array([0.229, 0.224, 0.225], dtype=np.float32).reshape(3, 1, 1)
 
 class RetinalAgeModel:
     def __init__(self, model_path=None):
-        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        self.model = timm.create_model(model_name='swin_base_patch4_window12_384', num_classes=1, pretrained=False)
-        self.model.to(self.device)
-        
         if model_path is None:
             model_path = MODEL_PATH
             
         if os.path.exists(model_path):
-            self.model.load_state_dict(torch.load(model_path, map_location=self.device))
-            self.model.eval()
-            print(f"Model loaded from {model_path} on {self.device}")
+            # Load ONNX model
+            self.session = onnxruntime.InferenceSession(model_path)
+            self.input_name = self.session.get_inputs()[0].name
+            print(f"ONNX Model loaded from {model_path}")
         else:
             print(f"WARNING: Model file not found at {model_path}")
-
-        self.transform = transforms.Compose([
-            transforms.ToTensor(),
-            transforms.Normalize(MEAN, STD),
-        ])
+            self.session = None
 
     def preprocess_image(self, img, laterality):
         """
@@ -38,6 +29,7 @@ class RetinalAgeModel:
         2. Auto-crop to remove black borders.
         3. Handle laterality (flip Left eyes).
         4. Resize to 384x384.
+        5. Normalize (ImageNet mean/std).
         """
         img = img.convert('RGB')
         img_np = np.array(img)
@@ -58,25 +50,34 @@ class RetinalAgeModel:
             img = Image.fromarray(img_np)
 
         # Handle Laterality
-        # If user specifies 'OS' (Left), we flip it to look like 'OD' (Right)
-        # The model is trained on OD (or flipped OS) images.
         if laterality == 'OS':
             img = img.transpose(Image.FLIP_LEFT_RIGHT)
         
         # Resize to 384x384
         img = img.resize((384, 384), Image.BICUBIC)
-        return img
+        
+        # To Tensor & Normalize (Manual implementation for Numpy)
+        img_np = np.array(img).astype(np.float32) / 255.0
+        img_np = img_np.transpose(2, 0, 1) # HWC -> CHW
+        img_np = (img_np - MEAN) / STD
+        
+        return img_np
 
     def predict(self, img, laterality):
         """
-        Runs inference on the image.
+        Runs inference on the image using ONNX Runtime.
         """
+        if self.session is None:
+            raise RuntimeError("Model not loaded")
+
         processed_img = self.preprocess_image(img, laterality)
-        img_tensor = self.transform(processed_img).unsqueeze(0).to(self.device)
         
-        with torch.no_grad():
-            output = self.model(img_tensor)
-            age = output.item()
+        # Add batch dimension
+        img_batch = np.expand_dims(processed_img, axis=0).astype(np.float32)
+        
+        # Run inference
+        output = self.session.run(None, {self.input_name: img_batch})
+        age = output[0].item()
             
         return round(age, 1)
 
