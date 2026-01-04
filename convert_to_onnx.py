@@ -1,18 +1,24 @@
 import torch
 import torch.onnx
-from webapp.model_utils import get_model
+import timm
 import onnx
 import onnxruntime
 import numpy as np
+import os
 
 def convert_to_onnx():
     print("Loading PyTorch model...")
-    model_wrapper = get_model()
-    model = model_wrapper.model
+    model = timm.create_model(model_name='swin_base_patch4_window12_384', num_classes=1, pretrained=False)
+    model_path = 'model_20220903.pth'
+    if not os.path.exists(model_path):
+        # Try one level up if not found (for running from webapp/ dir)
+        model_path = '../model_20220903.pth'
+    
+    model.load_state_dict(torch.load(model_path, map_location='cpu'))
     model.eval()
 
     # Create dummy input (Batch Size 1, 3 Channels, 384x384)
-    dummy_input = torch.randn(1, 3, 384, 384, device=model_wrapper.device)
+    dummy_input = torch.randn(1, 3, 384, 384)
 
     output_path = "model.onnx"
     
@@ -38,10 +44,10 @@ def convert_to_onnx():
     # Compare outputs
     print("Comparing outputs...")
     with torch.no_grad():
-        torch_out = model(dummy_input).cpu().numpy()
+        torch_out = model(dummy_input).numpy()
     
     ort_session = onnxruntime.InferenceSession(output_path)
-    ort_inputs = {ort_session.get_inputs()[0].name: dummy_input.cpu().numpy()}
+    ort_inputs = {ort_session.get_inputs()[0].name: dummy_input.numpy()}
     ort_out = ort_session.run(None, ort_inputs)[0]
     
     np.testing.assert_allclose(torch_out, ort_out, rtol=1e-03, atol=1e-05)

@@ -10,7 +10,7 @@ COPY webapp/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy model file (assuming it's in the build context root)
-COPY model.onnx .
+COPY model_float32.onnx .
 
 # Copy webapp code
 COPY webapp/ webapp/
