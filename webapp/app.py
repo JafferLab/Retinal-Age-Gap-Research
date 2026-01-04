@@ -15,8 +15,11 @@ from qc_utils import check_quality
 app = FastAPI(title="Retinal Age Gap Research App", version="1.0.0")
 
 # Mount static files
-app.mount("/static", StaticFiles(directory="static"), name="static")
-templates = Jinja2Templates(directory="templates")
+# Mount static files
+import os
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
+templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
 
 # Load model on startup
 @app.on_event("startup")
