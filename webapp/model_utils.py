@@ -4,18 +4,25 @@ from PIL import Image
 import os
 
 # Define constants
-MODEL_PATH = os.path.join(os.path.dirname(__file__), '..', 'model.onnx')
+# We'll try to use the float32 model if it exists, otherwise fallback to quantized
+MODEL_PATH_F32 = os.path.join(os.path.dirname(__file__), '..', 'model_float32.onnx')
+MODEL_PATH_QUANT = os.path.join(os.path.dirname(__file__), '..', 'model.onnx')
+
 MEAN = np.array([0.485, 0.456, 0.406], dtype=np.float32).reshape(3, 1, 1)
 STD = np.array([0.229, 0.224, 0.225], dtype=np.float32).reshape(3, 1, 1)
 
 class RetinalAgeModel:
     def __init__(self, model_path=None):
         if model_path is None:
-            model_path = MODEL_PATH
+            if os.path.exists(MODEL_PATH_F32):
+                model_path = MODEL_PATH_F32
+            else:
+                model_path = MODEL_PATH_QUANT
             
         if os.path.exists(model_path):
             # Load ONNX model
-            self.session = onnxruntime.InferenceSession(model_path)
+            # Use CPU provider explicitly to save memory
+            self.session = onnxruntime.InferenceSession(model_path, providers=['CPUExecutionProvider'])
             self.input_name = self.session.get_inputs()[0].name
             print(f"ONNX Model loaded from {model_path}")
         else:
@@ -26,7 +33,7 @@ class RetinalAgeModel:
         """
         Preprocesses the image:
         1. Convert to RGB.
-        2. Auto-crop to remove black borders.
+        2. Robust auto-crop to remove black borders.
         3. Handle laterality (flip Left eyes).
         4. Resize to 384x384.
         5. Normalize (ImageNet mean/std).
@@ -34,8 +41,9 @@ class RetinalAgeModel:
         img = img.convert('RGB')
         img_np = np.array(img)
         
-        # Threshold to find fundus area (remove black borders)
-        mask = img_np > 10
+        # Robust threshold to find fundus area
+        # We use a slightly higher threshold (20) to ignore compression noise in black areas
+        mask = img_np > 20
         if mask.ndim == 3:
             mask = mask.any(axis=2)
         
@@ -43,6 +51,15 @@ class RetinalAgeModel:
         if coords.size > 0:
             y0, x0 = coords.min(axis=0)
             y1, x1 = coords.max(axis=0) + 1
+            
+            # Add a small padding (2%) to ensure we don't cut the fundus
+            h, w = y1 - y0, x1 - x0
+            pad_h, pad_w = int(h * 0.02), int(w * 0.02)
+            y0 = max(0, y0 - pad_h)
+            y1 = min(img_np.shape[0], y1 + pad_h)
+            x0 = max(0, x0 - pad_w)
+            x1 = min(img_np.shape[1], x1 + pad_w)
+            
             img_crop = img_np[y0:y1, x0:x1]
             img = Image.fromarray(img_crop)
         else:
@@ -50,13 +67,19 @@ class RetinalAgeModel:
             img = Image.fromarray(img_np)
 
         # Handle Laterality
+        # Model expects disc on the RIGHT (standard for many retinal models)
+        # OD (Right) usually has disc on the right in standard fundus images? 
+        # Actually, let's stick to the logic that matches the desktop script.
+        # Desktop script ensured disc is on the RIGHT.
+        # test1.jpg (OD) has disc on the RIGHT.
+        # So OD stays as is. OS (disc on left) gets flipped to the right.
         if laterality == 'OS':
             img = img.transpose(Image.FLIP_LEFT_RIGHT)
         
         # Resize to 384x384
         img = img.resize((384, 384), Image.BICUBIC)
         
-        # To Tensor & Normalize (Manual implementation for Numpy)
+        # To Tensor & Normalize
         img_np = np.array(img).astype(np.float32) / 255.0
         img_np = img_np.transpose(2, 0, 1) # HWC -> CHW
         img_np = (img_np - MEAN) / STD
