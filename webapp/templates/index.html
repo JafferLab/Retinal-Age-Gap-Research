@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,9 +8,11 @@
     <link rel="stylesheet" href="/static/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
+
 <body>
     <div class="banner">
-        ⚠️ Research / Investigational Use Only | Model trained on healthy eyes | Not validated for external data | Not a diagnostic device
+        ⚠️ Research / Investigational Use Only | Model trained on healthy eyes | Not validated for external data | Not a
+        diagnostic device
     </div>
 
     <div class="container">
@@ -46,7 +49,7 @@
 
                 <button type="submit" class="btn-primary" id="predict-btn">Predict Retinal Age</button>
             </form>
-            
+
             <div id="loading-spinner" class="hidden">
                 <div class="spinner"></div>
                 <p>Processing image...</p>
@@ -56,7 +59,7 @@
         <!-- Results Panel -->
         <section id="results-section" class="card hidden">
             <h2>Prediction Results</h2>
-            
+
             <div class="result-row">
                 <div class="result-item">
                     <span class="label">Predicted Retinal Age</span>
@@ -76,6 +79,8 @@
             <div class="meta-info">
                 <small>Model: <span id="model-version"></span> | App: <span id="app-version"></span></small>
             </div>
+
+            <button type="button" class="btn-text start-over-btn">← Start Over</button>
         </section>
 
         <!-- Step 2: Age Gap -->
@@ -84,7 +89,8 @@
             <form id="gap-form">
                 <div class="form-group">
                     <label for="dob">Date of Birth</label>
-                    <input type="date" id="dob" name="dob" required>
+                    <input type="date" id="dob" name="dob" min="1900-01-01" max="2026-01-04" required>
+                    <small class="form-help">Tip: Click the year in the picker to change it quickly.</small>
                 </div>
                 <button type="submit" class="btn-secondary">Compute Retinal Age Gap</button>
             </form>
@@ -102,10 +108,49 @@
                         <span class="unit">years</span>
                     </div>
                 </div>
+                <button type="button" class="btn-text start-over-btn">← Start Over</button>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about-section" class="card">
+            <h2>About This Tool</h2>
+            <div class="about-content">
+                <p><strong>Retinal Age Gap (JOIR Model)</strong></p>
+                <p>This web application estimates retinal age from fundus photographs using a deep learning model
+                    developed by the Japan Ophthalmological Society, the Japan Ocular Imaging Registry (JOIR), and the
+                    National Institute of Informatics (NII). After retinal age is predicted, users may optionally enter
+                    date of birth to compute a retinal age gap, defined as:</p>
+                <p class="formula">Retinal Age Gap = Predicted Retinal Age − Chronological Age</p>
+                <p>This tool is intended for ophthalmic research and methodological exploration only. It is not a
+                    diagnostic device and should not be used for clinical decision-making.</p>
+
+                <h3>Model Provenance and Citation</h3>
+                <p>The retinal age estimation model is a publicly released JOIR model trained on fundus images collected
+                    from health checkup facilities in Japan.</p>
+                <p><strong>Required citation:</strong><br>
+                    Miyake M, Akiyama M, Kashiwagi K, Sakamoto T, Oshika T. Japan Ocular Imaging Registry: a national
+                    ophthalmology real-world database. Japanese Journal of Ophthalmology. 2022;66(6):499–503.
+                    doi:10.1007/s10384-022-00941-0.</p>
+
+                <h3>Training Data and Model Characteristics</h3>
+                <ul>
+                    <li><strong>Training dataset:</strong> 12,734 fundus images from 12,734 individuals</li>
+                    <li><strong>Population:</strong> Healthy eyes only</li>
+                    <li><strong>Age range:</strong> 18–84 years (mean ~42 years)</li>
+                    <li><strong>Healthy definition:</strong> No significant medical history, normal cardio-ankle
+                        vascular index, and blood pressure &lt;140/90 mmHg</li>
+                    <li><strong>Architecture:</strong> Swin Transformer (transfer learning from ImageNet)</li>
+                    <li><strong>Input size:</strong> 384 × 384 RGB</li>
+                    <li><strong>Output:</strong> Continuous age prediction (years)</li>
+                    <li><strong>Reported internal performance:</strong> Mean absolute error ≈ 2.39 years on held-out
+                        test data</li>
+                </ul>
             </div>
         </section>
     </div>
 
     <script src="/static/script.js"></script>
 </body>
+
 </html>

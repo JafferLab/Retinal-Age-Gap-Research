@@ -130,7 +130,8 @@ input[type="date"] {
     font-family: inherit;
 }
 
-.btn-primary, .btn-secondary {
+.btn-primary,
+.btn-secondary {
     display: block;
     width: 100%;
     padding: 0.75rem;
@@ -179,8 +180,13 @@ input[type="date"] {
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 .result-row {
@@ -233,4 +239,65 @@ input[type="date"] {
 
 .highlight .value {
     color: var(--primary-color);
+}
+
+/* About Section */
+#about-section {
+    margin-top: 2rem;
+    background-color: #f8f9fa;
+    border-left: 4px solid var(--primary-color);
+}
+
+.about-content {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: #444;
+}
+
+.about-content h3 {
+    margin-top: 1.5rem;
+    font-size: 1.1rem;
+    color: var(--secondary-color);
+}
+
+.about-content ul {
+    padding-left: 1.2rem;
+}
+
+.about-content li {
+    margin-bottom: 0.5rem;
+}
+
+.formula {
+    background: #eee;
+    padding: 1rem;
+    border-radius: 4px;
+    text-align: center;
+    font-family: monospace;
+    font-weight: bold;
+    margin: 1rem 0;
+}
+
+/* Text Buttons */
+.btn-text {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 0.5rem 0;
+    text-decoration: underline;
+    margin-top: 1rem;
+    display: inline-block;
+}
+
+.btn-text:hover {
+    color: var(--secondary-color);
+}
+
+.form-help {
+    display: block;
+    margin-top: 0.25rem;
+    color: #666;
+    font-size: 0.8rem;
 }

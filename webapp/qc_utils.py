@@ -68,7 +68,7 @@ def check_quality(img):
         
     # Blur Threshold
     # Low variance = blurry
-    if blur_score < 50: # Adjust based on testing
+    if blur_score < 20: # Adjusted from 50 to 20 based on user feedback
         if status != 'FAIL': status = 'WARN'
         reasons.append('Blurry')
         

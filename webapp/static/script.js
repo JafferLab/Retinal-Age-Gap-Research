@@ -119,4 +119,35 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Error: ' + error.message);
         }
     });
+
+    // Start Over logic
+    const startOverButtons = document.querySelectorAll('.start-over-btn');
+    startOverButtons.forEach(btn => {
+        btn.addEventListener('click', resetApp);
+    });
+
+    function resetApp() {
+        // Reset forms
+        predictForm.reset();
+        gapForm.reset();
+
+        // Hide results sections
+        resultsSection.classList.add('hidden');
+        gapSection.classList.add('hidden');
+        gapResults.classList.add('hidden');
+
+        // Show upload section
+        uploadSection.classList.remove('hidden');
+
+        // Clear results text
+        predictedAgeVal.textContent = '--';
+        qcStatus.textContent = '--';
+        qcStatus.className = 'status-badge';
+        qcIssues.textContent = '';
+        chronoAgeVal.textContent = '--';
+        ageGapVal.textContent = '--';
+
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 });
