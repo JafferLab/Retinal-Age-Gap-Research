@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: retinal-age-app
+    env: docker
+    plan: free
+    region: oregon
+    branch: main
+    healthCheckPath: /
+    autoDeploy: true
