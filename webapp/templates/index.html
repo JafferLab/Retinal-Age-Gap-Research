@@ -153,6 +153,8 @@
                     <li><strong>Architecture:</strong> Swin Transformer (transfer learning from ImageNet)</li>
                     <li><strong>Input size:</strong> 384 × 384 RGB</li>
                     <li><strong>Output:</strong> Continuous age prediction (years)</li>
+                    <li><strong>Deployment Optimization:</strong> Model quantized to 8-bit integer (int8) and
+                        implemented with lazy loading to ensure stability on cloud infrastructure.</li>
                     <li><strong>Reported internal performance:</strong> Mean absolute error ≈ 2.39 years on held-out
                         test data</li>
                 </ul>
