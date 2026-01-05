@@ -4,7 +4,8 @@ from PIL import Image
 import os
 
 # Define constants
-# We'll try to use the float32 model if it exists, otherwise fallback to quantized
+# We'll use the float16 model to fit within Render's memory limits
+MODEL_PATH_F16 = os.path.join(os.path.dirname(__file__), '..', 'model_fp16.onnx')
 MODEL_PATH_F32 = os.path.join(os.path.dirname(__file__), '..', 'model_float32.onnx')
 MODEL_PATH_QUANT = os.path.join(os.path.dirname(__file__), '..', 'model.onnx')
 
@@ -14,7 +15,9 @@ STD = np.array([0.229, 0.224, 0.225], dtype=np.float32).reshape(3, 1, 1)
 class RetinalAgeModel:
     def __init__(self, model_path=None):
         if model_path is None:
-            if os.path.exists(MODEL_PATH_F32):
+            if os.path.exists(MODEL_PATH_F16):
+                model_path = MODEL_PATH_F16
+            elif os.path.exists(MODEL_PATH_F32):
                 model_path = MODEL_PATH_F32
             else:
                 model_path = MODEL_PATH_QUANT
