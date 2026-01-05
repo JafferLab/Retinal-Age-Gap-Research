@@ -301,3 +301,27 @@ input[type="date"] {
     color: #666;
     font-size: 0.8rem;
 }
+
+.recalibration-note {
+    font-size: 0.75rem;
+    color: var(--primary-color);
+    margin-top: 0.5rem;
+    font-weight: 500;
+}
+
+.recalibration-info {
+    background: rgba(var(--primary-rgb), 0.05);
+    border-left: 4px solid var(--primary-color);
+    padding: 1rem;
+    margin: 1.5rem 0;
+    border-radius: 0 8px 8px 0;
+}
+
+.recalibration-info p {
+    margin: 0.5rem 0;
+}
+
+.recalibration-info .formula {
+    margin-top: 0.5rem;
+    font-weight: 600;
+}

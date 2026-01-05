@@ -100,9 +100,13 @@ class RetinalAgeModel:
         
         # Run inference
         output = self.session.run(None, {self.input_name: img_batch})
-        age = output[0].item()
+        raw_age = output[0].item()
+        
+        # Apply population-specific recalibration (Age 20-70 subset)
+        # Formula: Corrected Age = (0.3582 * Predicted Age) + 33.8793
+        recalibrated_age = (0.3582 * raw_age) + 33.8793
             
-        return round(age, 1)
+        return round(recalibrated_age, 1)
 
 # Global instance
 _model_instance = None
