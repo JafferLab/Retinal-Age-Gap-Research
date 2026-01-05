@@ -21,10 +21,19 @@ class RetinalAgeModel:
             
         if os.path.exists(model_path):
             # Load ONNX model
-            # Use CPU provider explicitly to save memory
-            self.session = onnxruntime.InferenceSession(model_path, providers=['CPUExecutionProvider'])
+            # Use CPU provider explicitly and optimize for low memory
+            options = onnxruntime.SessionOptions()
+            options.enable_mem_pattern = False
+            options.enable_cpu_mem_arena = False
+            options.execution_mode = onnxruntime.ExecutionMode.ORT_SEQUENTIAL
+            
+            self.session = onnxruntime.InferenceSession(
+                model_path, 
+                sess_options=options,
+                providers=['CPUExecutionProvider']
+            )
             self.input_name = self.session.get_inputs()[0].name
-            print(f"ONNX Model loaded from {model_path}")
+            print(f"ONNX Model loaded from {model_path} (Memory Optimized)")
         else:
             print(f"WARNING: Model file not found at {model_path}")
             self.session = None
