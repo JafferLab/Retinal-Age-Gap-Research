@@ -2,6 +2,6 @@ fastapi
 uvicorn
 python-multipart
 jinja2
-onnxruntime.Ratio
+onnxruntime
 pillow
 numpy
