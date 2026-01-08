@@ -9,6 +9,10 @@ MODEL_PATH_INT8 = os.path.join(os.path.dirname(__file__), 'model_int8.onnx')
 MEAN = np.array([0.485, 0.456, 0.406], dtype=np.float32).reshape(3, 1, 1)
 STD = np.array([0.229, 0.224, 0.225], dtype=np.float32).reshape(3, 1, 1)
 
+# Recalibration constants (derived from ODIR-5K 20-70 age analysis)
+RECALIB_SLOPE = 0.3582
+RECALIB_INTERCEPT = 33.8793
+
 class RetinalAgeModel:
     def __init__(self, model_path=None):
         self.session = None
@@ -70,8 +74,16 @@ class RetinalAgeModel:
         img_np = (img_np - MEAN) / STD
         return img_np
 
-    def predict(self, img, laterality, recalibration_mode='original'):
-        """Runs inference on the image."""
+    def predict(self, img, laterality, recalibration_mode='chinese'):
+        """Runs inference on the image.
+        
+        Args:
+            img: PIL Image
+            laterality: 'OD' or 'OS'
+            recalibration_mode: 'original' or 'chinese'
+                - 'chinese': Apply recalibration (default, optimized for ODIR-5K)
+                - 'original': Return raw model output (Japanese/JOIR baseline)
+        """
         import gc
         self._load_model() # Ensure model is loaded
         
@@ -86,12 +98,14 @@ class RetinalAgeModel:
         del img_batch
         gc.collect()
         
-        # Apply population-specific recalibration if requested
-        if recalibration_mode == 'chinese':
-            # Formula: Corrected Age = (0.3582 * Predicted Age) + 33.8793
-            final_age = (0.3582 * raw_age) + 33.8793
+        # The model was trained with recalibration baked in
+        # So raw output is already recalibrated for Chinese population
+        # To get "original" Japanese output, we need to reverse the recalibration
+        if recalibration_mode == 'original':
+            # Reverse the recalibration: age = (recalibrated - intercept) / slope
+            final_age = (raw_age - RECALIB_INTERCEPT) / RECALIB_SLOPE
         else:
-            # Original JOIR model output
+            # Chinese mode: use the model output as-is (already recalibrated)
             final_age = raw_age
             
         return round(final_age, 1)
