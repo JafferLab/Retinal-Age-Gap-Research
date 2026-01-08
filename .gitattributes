@@ -2,3 +2,4 @@
 model.onnx filter=lfs diff=lfs merge=lfs -text
 model_float32.onnx filter=lfs diff=lfs merge=lfs -text
 model_fp16.onnx filter=lfs diff=lfs merge=lfs -text
+*.onnx filter=lfs diff=lfs merge=lfs -text
