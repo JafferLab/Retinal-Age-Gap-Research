@@ -29,6 +29,16 @@ class RetinalAgeModel:
             return
 
         if os.path.exists(self.model_path):
+            # LFS CHECK: Verify file size is substantial (e.g. > 1KB)
+            # The model is ~120MB. LFS pointers are ~130 bytes.
+            file_size = os.path.getsize(self.model_path)
+            if file_size < 1024:
+                raise RuntimeError(
+                    f"Model file is too small ({file_size} bytes). "
+                    "This implies Git LFS failed to download the actual binary. "
+                    "Ensure GIT_LFS_SKIP_SMUDGE=0 is set in your environment."
+                )
+
             # Load ONNX model with memory optimizations
             options = onnxruntime.SessionOptions()
             options.enable_mem_pattern = False

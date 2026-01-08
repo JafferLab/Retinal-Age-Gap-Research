@@ -22,6 +22,17 @@ class TestRetinalAgeModel(unittest.TestCase):
         self.slope = RECALIB_SLOPE
         self.intercept = RECALIB_INTERCEPT
 
+        # Patch os.path.exists and os.path.getsize to avoid real file checks
+        self.patcher_exists = patch('model_utils.os.path.exists', return_value=True)
+        self.patcher_getsize = patch('model_utils.os.path.getsize', return_value=120*1024*1024) # 120MB
+        
+        self.mock_exists = self.patcher_exists.start()
+        self.mock_getsize = self.patcher_getsize.start()
+
+    def tearDown(self):
+        self.patcher_exists.stop()
+        self.patcher_getsize.stop()
+
     @patch('model_utils.onnxruntime.InferenceSession')
     def test_predict_original_mode(self, mock_session_cls):
         """Test that 'original' mode returns the raw model output."""
