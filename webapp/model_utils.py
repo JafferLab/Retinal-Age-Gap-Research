@@ -4,11 +4,7 @@ from PIL import Image
 import os
 
 # Define constants
-# We'll use the int8 model to fit within Render's strict memory limits
 MODEL_PATH_INT8 = os.path.join(os.path.dirname(__file__), 'model_int8.onnx')
-MODEL_PATH_F16 = os.path.join(os.path.dirname(__file__), '..', 'model_fp16.onnx')
-MODEL_PATH_F32 = os.path.join(os.path.dirname(__file__), '..', 'model_float32.onnx')
-MODEL_PATH_QUANT = os.path.join(os.path.dirname(__file__), '..', 'model.onnx')
 
 MEAN = np.array([0.485, 0.456, 0.406], dtype=np.float32).reshape(3, 1, 1)
 STD = np.array([0.229, 0.224, 0.225], dtype=np.float32).reshape(3, 1, 1)
@@ -17,18 +13,11 @@ class RetinalAgeModel:
     def __init__(self, model_path=None):
         self.session = None
         self.input_name = None
-        self.model_path = model_path
         
-        if self.model_path is None:
-            # Priority: int8 (smallest) -> fp16 -> fp32
-            if os.path.exists(MODEL_PATH_INT8):
-                self.model_path = MODEL_PATH_INT8
-            elif os.path.exists(MODEL_PATH_F16):
-                self.model_path = MODEL_PATH_F16
-            elif os.path.exists(MODEL_PATH_F32):
-                self.model_path = MODEL_PATH_F32
-            else:
-                self.model_path = MODEL_PATH_QUANT
+        if model_path is None:
+            self.model_path = MODEL_PATH_INT8
+        else:
+            self.model_path = model_path
 
     def _load_model(self):
         """Lazy load the ONNX session."""
