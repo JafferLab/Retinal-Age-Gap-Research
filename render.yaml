@@ -7,3 +7,8 @@ services:
     branch: main
     healthCheckPath: /
     autoDeploy: true
+    buildFilter:
+      paths:
+        - webapp/**
+        - Dockerfile
+        - render.yaml
