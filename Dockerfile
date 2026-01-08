@@ -10,7 +10,7 @@ COPY webapp/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy model file
-COPY model_int8.onnx .
+COPY webapp/model_int8.onnx .
 
 # Copy webapp code
 COPY webapp/ webapp/

@@ -5,7 +5,7 @@ import os
 
 # Define constants
 # We'll use the int8 model to fit within Render's strict memory limits
-MODEL_PATH_INT8 = os.path.join(os.path.dirname(__file__), '..', 'model_int8.onnx')
+MODEL_PATH_INT8 = os.path.join(os.path.dirname(__file__), 'model_int8.onnx')
 MODEL_PATH_F16 = os.path.join(os.path.dirname(__file__), '..', 'model_fp16.onnx')
 MODEL_PATH_F32 = os.path.join(os.path.dirname(__file__), '..', 'model_float32.onnx')
 MODEL_PATH_QUANT = os.path.join(os.path.dirname(__file__), '..', 'model.onnx')
