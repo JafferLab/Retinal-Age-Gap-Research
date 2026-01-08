@@ -46,6 +46,14 @@ document.addEventListener('DOMContentLoaded', () => {
             // Update Results
             document.getElementById('predicted-age').textContent = data.predicted_age.toFixed(1);
 
+            const recalibrationNote = document.querySelector('.recalibration-note');
+            if (data.recalibration_mode === 'chinese') {
+                recalibrationNote.style.display = 'block';
+                recalibrationNote.textContent = '(Recalibrated for Chinese population)';
+            } else {
+                recalibrationNote.style.display = 'none';
+            }
+
             const qcStatusEl = document.getElementById('qc-status');
             qcStatusEl.textContent = data.qc_status;
 
@@ -131,21 +139,22 @@ document.addEventListener('DOMContentLoaded', () => {
         predictForm.reset();
         gapForm.reset();
 
+        // Reset file placeholder
+        filePlaceholder.textContent = 'Click to upload or drag and drop';
+
         // Hide results sections
         resultsSection.classList.add('hidden');
         gapSection.classList.add('hidden');
         gapResults.classList.add('hidden');
 
         // Show upload section
-        uploadSection.classList.remove('hidden');
+        predictForm.classList.remove('hidden');
 
         // Clear results text
-        predictedAgeVal.textContent = '--';
-        qcStatus.textContent = '--';
-        qcStatus.className = 'status-badge';
-        qcIssues.textContent = '';
-        chronoAgeVal.textContent = '--';
-        ageGapVal.textContent = '--';
+        document.getElementById('predicted-age').textContent = '--';
+        document.getElementById('qc-status').textContent = '--';
+        document.getElementById('chrono-age').textContent = '--';
+        document.getElementById('age-gap').textContent = '--';
 
         // Scroll to top
         window.scrollTo({ top: 0, behavior: 'smooth' });

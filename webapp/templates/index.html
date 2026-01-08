@@ -47,6 +47,15 @@
                     </div>
                 </div>
 
+                <div class="form-group">
+                    <label for="recalibration-mode">Population Recalibration</label>
+                    <select id="recalibration-mode" name="recalibration_mode">
+                        <option value="original">Original (Japanese/JOIR)</option>
+                        <option value="chinese">Chinese (ODIR-5K Optimized)</option>
+                    </select>
+                    <small class="form-help">Select the population mode for optimized accuracy.</small>
+                </div>
+
                 <button type="submit" class="btn-primary" id="predict-btn">Predict Retinal Age</button>
             </form>
 
@@ -65,7 +74,7 @@
                     <span class="label">Predicted Retinal Age</span>
                     <span class="value" id="predicted-age">--</span>
                     <span class="unit">years</span>
-                    <div class="recalibration-note">Recalibrated for improved accuracy</div>
+                    <div class="recalibration-note" style="display: none;">Recalibrated for improved accuracy</div>
                 </div>
                 <div class="result-item">
                     <span class="label">QC Status</span>
@@ -125,11 +134,17 @@
                 <p class="formula">Retinal Age Gap = Predicted Retinal Age − Chronological Age</p>
 
                 <div class="recalibration-info">
-                    <p><strong>Population-Specific Recalibration:</strong></p>
-                    <p>Based on our evaluation of the ODIR-5K dataset (Chinese population), the original JOIR model
-                        showed a systematic overestimation bias. To improve accuracy, we have applied a linear
-                        recalibration as the baseline:</p>
-                    <p class="formula">Recalibrated Age = (0.3582 × Raw Model Output) + 33.8793</p>
+                    <p><strong>Population-Specific Recalibration Options:</strong></p>
+                    <p>Users can select between different recalibration modes to optimize accuracy for specific
+                        populations:</p>
+                    <ul>
+                        <li><strong>Original (Japanese/JOIR):</strong> The raw output of the model trained on the JOIR
+                            dataset.</li>
+                        <li><strong>Chinese (ODIR-5K Optimized):</strong> Applies a linear correction derived from our
+                            evaluation of the ODIR-5K dataset to eliminate systematic overestimation bias:
+                            <p class="formula">Recalibrated Age = (0.3582 × Raw Model Output) + 33.8793</p>
+                        </li>
+                    </ul>
                 </div>
 
                 <p>This tool is intended for ophthalmic research and methodological exploration only. It is not a

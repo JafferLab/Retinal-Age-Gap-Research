@@ -53,7 +53,6 @@ class RetinalAgeModel:
             raise RuntimeError(f"Model file not found at {self.model_path}")
 
     def preprocess_image(self, img, laterality):
-        # ... (rest of the method remains same)
         img = img.convert('RGB')
         img_np = np.array(img)
         
@@ -82,8 +81,9 @@ class RetinalAgeModel:
         img_np = (img_np - MEAN) / STD
         return img_np
 
-    def predict(self, img, laterality):
+    def predict(self, img, laterality, recalibration_mode='original'):
         """Runs inference on the image."""
+        import gc
         self._load_model() # Ensure model is loaded
         
         processed_img = self.preprocess_image(img, laterality)
@@ -92,9 +92,20 @@ class RetinalAgeModel:
         output = self.session.run(None, {self.input_name: img_batch})
         raw_age = output[0].item()
         
-        # Apply population-specific recalibration
-        recalibrated_age = (0.3582 * raw_age) + 33.8793
-        return round(recalibrated_age, 1)
+        # Explicitly delete large objects and trigger GC
+        del processed_img
+        del img_batch
+        gc.collect()
+        
+        # Apply population-specific recalibration if requested
+        if recalibration_mode == 'chinese':
+            # Formula: Corrected Age = (0.3582 * Predicted Age) + 33.8793
+            final_age = (0.3582 * raw_age) + 33.8793
+        else:
+            # Original JOIR model output
+            final_age = raw_age
+            
+        return round(final_age, 1)
 
 # Global instance
 _model_instance = None

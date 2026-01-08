@@ -15,7 +15,6 @@ from qc_utils import check_quality
 app = FastAPI(title="Retinal Age Gap Research App", version="1.0.0")
 
 # Mount static files
-# Mount static files
 import os
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
@@ -33,7 +32,8 @@ async def read_root(request: Request):
 @app.post("/predict")
 async def predict(
     file: UploadFile = File(...),
-    laterality: str = Form(...)
+    laterality: str = Form(...),
+    recalibration_mode: str = Form("original")
 ):
     if laterality not in ['OD', 'OS']:
         raise HTTPException(status_code=400, detail="Invalid laterality. Must be OD or OS.")
@@ -47,7 +47,7 @@ async def predict(
         
         # Prediction
         model = get_model()
-        predicted_age = model.predict(img, laterality)
+        predicted_age = model.predict(img, laterality, recalibration_mode)
         
         return {
             "predicted_age": predicted_age,
@@ -56,7 +56,8 @@ async def predict(
             "qc_reasons": qc_result['reasons'],
             "server_date": date.today().isoformat(),
             "model_version": "JOIR_Swin_20220903",
-            "app_version": "1.0.0"
+            "app_version": "1.0.0",
+            "recalibration_mode": recalibration_mode
         }
         
     except Exception as e:

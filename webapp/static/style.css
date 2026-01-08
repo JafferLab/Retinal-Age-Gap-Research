@@ -122,12 +122,14 @@ input[type="file"] {
     cursor: pointer;
 }
 
-input[type="date"] {
+input[type="date"],
+select {
     width: 100%;
     padding: 0.5rem;
     border: 1px solid var(--border-color);
     border-radius: 0.375rem;
     font-family: inherit;
+    background-color: white;
 }
 
 .btn-primary,
@@ -310,7 +312,7 @@ input[type="date"] {
 }
 
 .recalibration-info {
-    background: rgba(var(--primary-rgb), 0.05);
+    background: rgba(37, 99, 235, 0.05);
     border-left: 4px solid var(--primary-color);
     padding: 1rem;
     margin: 1.5rem 0;
