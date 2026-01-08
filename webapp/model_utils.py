@@ -98,15 +98,16 @@ class RetinalAgeModel:
         del img_batch
         gc.collect()
         
-        # The model was trained with recalibration baked in
-        # So raw output is already recalibrated for Chinese population
-        # To get "original" Japanese output, we need to reverse the recalibration
+        # The model is the original JOIR model (Japanese population)
+        # So raw output is "Original"
+        # To get "Chinese" output (ODIR-5K optimized), we apply the recalibration
         if recalibration_mode == 'original':
-            # Reverse the recalibration: age = (recalibrated - intercept) / slope
-            final_age = (raw_age - RECALIB_INTERCEPT) / RECALIB_SLOPE
-        else:
-            # Chinese mode: use the model output as-is (already recalibrated)
+            # return raw output
             final_age = raw_age
+        else:
+            # Chinese mode: apply recalibration
+            # age = (raw * slope) + intercept
+            final_age = (raw_age * RECALIB_SLOPE) + RECALIB_INTERCEPT
             
         return round(final_age, 1)
 
