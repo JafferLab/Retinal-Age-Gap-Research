@@ -7,8 +7,6 @@ services:
     branch: main
     healthCheckPath: /
     autoDeploy: true
-    buildFilter:
-      paths:
-        - webapp/**
-        - Dockerfile
-        - render.yaml
+    envVars:
+      - key: GIT_LFS_SKIP_SMUDGE
+        value: "0"
