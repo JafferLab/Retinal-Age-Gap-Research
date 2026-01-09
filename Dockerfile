@@ -11,7 +11,9 @@ COPY . .
 # Extract the webapp requirements manually
 RUN pip install --no-cache-dir -r webapp/requirements.txt
 
-# Explicitly pull LFS files
+# Explicitly pull LFS files (force public remote to bypass Render config issues)
+RUN git remote set-url origin https://github.com/JafferLab/Retinal-Age-Gap-Research.git || git remote add origin https://github.com/JafferLab/Retinal-Age-Gap-Research.git
+RUN git fetch origin
 RUN git lfs install && git lfs pull --include="webapp/model_int8.onnx"
 
 # Verify LFS download (fail build if model is a pointer file)
