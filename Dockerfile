@@ -1,20 +1,19 @@
 FROM python:3.9-slim
 
-# Install git and git-lfs to handle model download manually
-RUN apt-get update && apt-get install -y git git-lfs && rm -rf /var/lib/apt/lists/*
+# Install wget to download model (bypassing git-lfs entirely)
+RUN apt-get update && apt-get install -y wget && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# Copy ALL files including .git so we can run git commands
+# Copy ALL files including .git
 COPY . .
 
 # Extract the webapp requirements manually
 RUN pip install --no-cache-dir -r webapp/requirements.txt
 
-# Explicitly pull LFS files (force public remote to bypass Render config issues)
-RUN git remote set-url origin https://github.com/JafferLab/Retinal-Age-Gap-Research.git || git remote add origin https://github.com/JafferLab/Retinal-Age-Gap-Research.git
-RUN git fetch origin
-RUN git lfs install && git lfs pull --include="webapp/model_int8.onnx"
+# Explicitly download the LFS file using wget
+# This points to the raw LFS media URL for the public repo
+RUN wget -O webapp/model_int8.onnx https://github.com/JafferLab/Retinal-Age-Gap-Research/raw/main/webapp/model_int8.onnx
 
 # Verify LFS download (fail build if model is a pointer file)
 RUN python3 -c "import os; size = os.path.getsize('webapp/model_int8.onnx'); exit(1) if size < 1024 else exit(0)" || \
