@@ -10,6 +10,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY webapp/ webapp/
 
 # Verify LFS download (fail build if model is a pointer file)
+RUN ls -laR webapp/
 RUN python3 -c "import os; size = os.path.getsize('webapp/model_int8.onnx'); exit(1) if size < 1024 else exit(0)" || \
     (echo "ERROR: Model file is too small. Git LFS download failed. Set GIT_LFS_SKIP_SMUDGE=0 in Render Environment." && exit 1)
 
